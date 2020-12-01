@@ -204,6 +204,10 @@ static void clear_unit( melted_unit unit )
 
 static void clean_unit( melted_unit unit )
 {
+	clear_unit( unit );
+	update_generation( unit );
+	return;
+
 	mlt_properties properties = unit->properties;
 	mlt_playlist playlist = mlt_properties_get_data( properties, "playlist", NULL );
 	mlt_consumer consumer = mlt_properties_get_data( properties, "consumer", NULL );
