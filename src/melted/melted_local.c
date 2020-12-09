@@ -300,28 +300,25 @@ void signal_handler( int sig )
 
 static void sigsegv_handler()
 {
-#ifdef linux
 	void *array[ 10 ];
 	size_t size;
 	char **strings;
 	size_t i;
 
-	melted_log( LOG_CRIT, "\a\nmelted experienced a segmentation fault.\n"
+	fprintf( stderr, "\a\nmelted experienced a segmentation fault.\n"
 		"Dumping stack from the offending thread\n\n" );
 	size = backtrace( array, 10 );
 	strings = backtrace_symbols( array, size );
 
-	melted_log( LOG_CRIT, "Obtained %zd stack frames.\n", size );
+	fprintf( stderr, "Obtained %zd stack frames.\n", size );
 
 	for ( i = 0; i < size; i++ )
-		 melted_log( LOG_CRIT, "%s", strings[ i ] );
+		 fprintf( stderr, "%s\n", strings[ i ] );
 
 	free( strings );
 
-	melted_log( LOG_CRIT, "\nDone dumping - exiting.\n" );
-#else
-	melted_log( LOG_CRIT, "\a\nmelted experienced a segmentation fault.\n" );
-#endif
+	fprintf( stderr, "\nDone dumping - exiting.\n" );
+	// melted_log( LOG_CRIT, "\a\nmelted experienced a segmentation fault.\n" );
 	exit( EXIT_FAILURE );
 }
 
@@ -345,8 +342,7 @@ static mvcp_response melted_local_connect( melted_local local )
 	signal( SIGPIPE, signal_handler );
 	signal( SIGALRM, signal_handler );
 	signal( SIGCHLD, SIG_IGN );
-	if ( getenv( "MLT_SIGSEGV" ) )
-		signal( SIGSEGV, sigsegv_handler );
+	signal( SIGSEGV, sigsegv_handler );
 
 	return response;
 }
