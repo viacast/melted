@@ -363,7 +363,12 @@ int melted_command_parse_unit( command_argument cmd, int argument )
 	int unit = -1;
 	char *string = mvcp_tokeniser_get_string( cmd->tokeniser, argument );
 	if ( string != NULL && ( string[ 0 ] == 'U' || string[ 0 ] == 'u' ) && strlen( string ) > 1 )
-		unit = atoi( string + 1 );
+	{
+		if ( string[1] == 'A' || string[1] == 'a' )
+			unit = INT_MAX;
+		else
+			unit = atoi( string + 1 );
+	}
 	return unit;
 }
 

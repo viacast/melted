@@ -306,8 +306,7 @@ int melted_play( command_argument cmd_arg )
 {
 	melted_unit unit = melted_get_unit(cmd_arg->unit);
 	
-	if ( unit == NULL )
-	{
+	if (unit == NULL && cmd_arg->unit != INT_MAX) {
 		return RESPONSE_INVALID_UNIT;
 	}
 	else
@@ -315,7 +314,14 @@ int melted_play( command_argument cmd_arg )
 		int speed = 1000;
 		if ( mvcp_tokeniser_count( cmd_arg->tokeniser ) == 3 )
 			speed = atoi( mvcp_tokeniser_get_string( cmd_arg->tokeniser, 2 ) );
-		melted_unit_play( unit, speed );
+		if (unit == NULL) {
+			for (int i = 0; i < MAX_UNITS; ++i) {
+				unit = melted_get_unit(i);
+				if (unit != NULL)
+					melted_unit_play(unit, speed);
+			}
+		} else
+			melted_unit_play(unit, speed);
 	}
 
 	return RESPONSE_SUCCESS;
@@ -324,20 +330,36 @@ int melted_play( command_argument cmd_arg )
 int melted_stop( command_argument cmd_arg )
 {
 	melted_unit unit = melted_get_unit(cmd_arg->unit);
-	if ( unit == NULL )
+	if (unit == NULL && cmd_arg->unit != INT_MAX)
 		return RESPONSE_INVALID_UNIT;
-	else 
-		melted_unit_terminate( unit );
+	else {
+		if (unit == NULL) {
+			for (int i = 0; i < MAX_UNITS; ++i) {
+				unit = melted_get_unit(i);
+				if (unit != NULL)
+					melted_unit_terminate(unit);
+			}
+		} else
+			melted_unit_terminate(unit);
+	}
 	return RESPONSE_SUCCESS;
 }
 
 int melted_pause( command_argument cmd_arg )
 {
 	melted_unit unit = melted_get_unit(cmd_arg->unit);
-	if ( unit == NULL )
+	if (unit == NULL && cmd_arg->unit != INT_MAX)
 		return RESPONSE_INVALID_UNIT;
-	else 
-		melted_unit_play( unit, 0 );
+	else {
+		if (unit == NULL) {
+			for (int i = 0; i < MAX_UNITS; ++i) {
+				unit = melted_get_unit(i);
+				if (unit != NULL)
+					melted_unit_play(unit, 0);
+			}
+		} else
+			melted_unit_play(unit, 0);
+	} 
 	return RESPONSE_SUCCESS;
 }
 
