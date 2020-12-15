@@ -300,14 +300,14 @@ void signal_handler( int sig )
 
 static void sigsegv_handler()
 {
-	void *array[ 10 ];
+	void *array[ 50 ];
 	size_t size;
 	char **strings;
 	size_t i;
 
 	fprintf( stderr, "\a\nmelted experienced a segmentation fault.\n"
 		"Dumping stack from the offending thread\n\n" );
-	size = backtrace( array, 10 );
+	size = backtrace( array, 50 );
 	strings = backtrace_symbols( array, size );
 
 	fprintf( stderr, "Obtained %zd stack frames.\n", size );
