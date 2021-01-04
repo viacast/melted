@@ -121,36 +121,70 @@ static int parse_clip( command_argument cmd_arg, int arg )
 	return clip;
 }
 
+typedef struct {
+	char name[1024];
+	int target_index;
+	int32_t in;
+	int32_t out;
+} Clip;
+
+static int cmpinsert (const void * a, const void * b) {
+   return (((Clip *)b)->target_index - ((Clip*)a)->target_index);
+}
+
 int melted_insert( command_argument cmd_arg )
 {
 	melted_unit unit = melted_get_unit(cmd_arg->unit);
-	char *filename = (char*) cmd_arg->argument;
-	char fullname[1024];
-
-	get_fullname( cmd_arg, fullname, sizeof(fullname), filename );
 
 	if (unit == NULL)
 		return RESPONSE_INVALID_UNIT;
-	else
-	{
-		long in = -1, out = -1;
-		int index = parse_clip( cmd_arg, 3 );
-		
-		if ( mvcp_tokeniser_count( cmd_arg->tokeniser ) == 6 )
+
+	int clip_count = (mvcp_tokeniser_count(cmd_arg->tokeniser) - 2)/4;
+	clip_count = clip_count ? clip_count : 1;
+
+	Clip clips[clip_count];
+
+	for (int i = 0; i < clip_count; ++i) {
+		int base_index = 2 + i*4;
+
+		char *filename = mvcp_tokeniser_get_string(cmd_arg->tokeniser, base_index);
+		char fullname[1024];
+
+		get_fullname( cmd_arg, fullname, sizeof(fullname), filename );
+
+		int32_t in = -1, out = -1;
+		int target_index = -1;
+		if ( mvcp_tokeniser_count( cmd_arg->tokeniser ) > base_index + 3 )
 		{
-			in = atoi( mvcp_tokeniser_get_string( cmd_arg->tokeniser, 4 ) );
-			out = atoi( mvcp_tokeniser_get_string( cmd_arg->tokeniser, 5 ) );
+			target_index = atoi( mvcp_tokeniser_get_string( cmd_arg->tokeniser, base_index + 1 ) );
+			in = atol( mvcp_tokeniser_get_string( cmd_arg->tokeniser, base_index + 2 ) );
+			out = atol( mvcp_tokeniser_get_string( cmd_arg->tokeniser, base_index + 3 ) );
 		}
-		
-		switch( melted_unit_insert( unit, fullname, index, in, out ) )
+
+		strcpy(clips[i].name, fullname);
+		clips[i].target_index = target_index;
+		clips[i].in = in;
+		clips[i].out = out;
+	}
+
+	qsort(clips, clip_count, sizeof(Clip), cmpinsert);
+
+	for (int i = 0; i < clip_count; ++i) {
+		Clip clip = clips[i];
+		switch ( melted_unit_insert( unit, clip.name, clip.target_index, clip.in, clip.out ) )
 		{
 			case mvcp_ok:
-				return RESPONSE_SUCCESS;
+				continue;
 			default:
 				return RESPONSE_BAD_FILE;
 		}
 	}
+
 	return RESPONSE_SUCCESS;
+}
+
+static int cmpremove (const void * a, const void * b) {
+   return (*(int*)b - *(int*)a);
 }
 
 int melted_remove( command_argument cmd_arg )
@@ -159,11 +193,19 @@ int melted_remove( command_argument cmd_arg )
 	
 	if (unit == NULL)
 		return RESPONSE_INVALID_UNIT;
-	else
-	{
-		int index = parse_clip( cmd_arg, 2 );
-			
-		if ( melted_unit_remove( unit, index ) != mvcp_ok )
+
+	int clip_count = mvcp_tokeniser_count(cmd_arg->tokeniser) - 2;
+	clip_count = clip_count ? clip_count : 1;
+	int clips[clip_count];
+
+	for (int i = 0; i < clip_count; ++i) {
+		int clip = parse_clip(cmd_arg, 2 + i);
+		clips[i] = clip;
+	}
+
+	qsort(clips, clip_count, sizeof(int), cmpremove);
+	for (int i = 0; i < clip_count; ++i) {
+		if ( melted_unit_remove( unit, clips[i] ) != mvcp_ok )
 			return RESPONSE_BAD_FILE;
 	}
 	return RESPONSE_SUCCESS;
@@ -241,25 +283,30 @@ int melted_move( command_argument cmd_arg )
 int melted_append( command_argument cmd_arg )
 {
 	melted_unit unit = melted_get_unit(cmd_arg->unit);
-	char *filename = (char*) cmd_arg->argument;
-	char fullname[1024];
-
-	get_fullname( cmd_arg, fullname, sizeof(fullname), filename );
-
 	if (unit == NULL)
 		return RESPONSE_INVALID_UNIT;
-	else
-	{
+
+	int clips = (mvcp_tokeniser_count(cmd_arg->tokeniser) - 2)/3;
+	clips = clips ? clips : 1;
+
+	for (int i = 0; i < clips; ++i) {
+		int base_index = 2 + i*3;
+
+		char *filename = mvcp_tokeniser_get_string(cmd_arg->tokeniser, base_index);
+		char fullname[1024];
+
+		get_fullname( cmd_arg, fullname, sizeof(fullname), filename );
+
 		int32_t in = -1, out = -1;
-		if ( mvcp_tokeniser_count( cmd_arg->tokeniser ) == 5 )
+		if ( mvcp_tokeniser_count( cmd_arg->tokeniser ) > base_index + 2 )
 		{
-			in = atol( mvcp_tokeniser_get_string( cmd_arg->tokeniser, 3 ) );
-			out = atol( mvcp_tokeniser_get_string( cmd_arg->tokeniser, 4 ) );
+			in = atol( mvcp_tokeniser_get_string( cmd_arg->tokeniser, base_index + 1 ) );
+			out = atol( mvcp_tokeniser_get_string( cmd_arg->tokeniser, base_index + 2 ) );
 		}
 		switch ( melted_unit_append( unit, fullname, in, out ) )
 		{
 			case mvcp_ok:
-				return RESPONSE_SUCCESS;
+				continue;
 			default:
 				return RESPONSE_BAD_FILE;
 		}
