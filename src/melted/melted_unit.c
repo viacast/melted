@@ -395,6 +395,11 @@ mvcp_error_code melted_unit_move( melted_unit unit, int src, int dest )
 	return mvcp_ok;
 }
 
+mvcp_error_code melted_unit_check_clip(melted_unit unit, char *clip)
+{
+	return locate_producer(unit, clip) ? mvcp_ok : mvcp_invalid_file;
+}
+
 /** Add a clip to the unit play list.
 
     \todo error handling

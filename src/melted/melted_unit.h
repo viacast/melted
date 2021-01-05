@@ -42,6 +42,7 @@ extern void 				melted_unit_report_list( melted_unit unit, mvcp_response respons
 extern void                 melted_unit_allow_stdin( melted_unit unit, int flag );
 extern mvcp_error_code   melted_unit_load( melted_unit unit, char *clip, int32_t in, int32_t out, int flush );
 extern mvcp_error_code 	melted_unit_insert( melted_unit unit, char *clip, int index, int32_t in, int32_t out );
+extern mvcp_error_code   melted_unit_check_clip( melted_unit unit, char *clip );
 extern mvcp_error_code   melted_unit_append( melted_unit unit, char *clip, int32_t in, int32_t out );
 extern mvcp_error_code   melted_unit_append_service( melted_unit unit, mlt_service service );
 extern mvcp_error_code 	melted_unit_remove( melted_unit unit, int index );
