@@ -128,8 +128,12 @@ typedef struct {
 	int32_t out;
 } Clip;
 
-static int cmpinsert (const void * a, const void * b) {
-   return (((Clip *)a)->target_index - ((Clip*)b)->target_index);
+static int cmpinsert(const void * a, const void * b) {
+	int target_a = ((Clip*)a)->target_index;
+	int target_b = ((Clip*)b)->target_index;
+	if (target_a != target_b)
+		return target_b - target_a;
+	return 1;
 }
 
 int melted_insert( command_argument cmd_arg )
@@ -180,8 +184,8 @@ int melted_insert( command_argument cmd_arg )
 	return RESPONSE_SUCCESS;
 }
 
-static int cmpremove (const void * a, const void * b) {
-   return (*(int*)b - *(int*)a);
+static int cmpremove(const void * a, const void * b) {
+  return (*(int*)b - *(int*)a);
 }
 
 int melted_remove( command_argument cmd_arg )
