@@ -261,16 +261,23 @@ int melted_move( command_argument cmd_arg )
 	if (unit == NULL)
 		return RESPONSE_INVALID_UNIT;
 
-	int move_count = (mvcp_tokeniser_count(cmd_arg->tokeniser) - 2)/2;
-	move_count = move_count ? move_count : 1;
+	int move_count = 1;
+	
+	if (mvcp_tokeniser_count(cmd_arg->tokeniser) > 4) {
+		move_count = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, 4));
+	}
+
+	int firstSrc = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, 2));
+	int firstDest = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, 3));
 
 	for (int i = 0; i < move_count; ++i) {
-		int base_index = 2 + i*2;
-		int src = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, base_index));
-		int dest = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, base_index + 1));
-
-		if (melted_unit_move(unit, src, dest) != mvcp_ok)
-			return RESPONSE_BAD_FILE;
+		if (firstDest > firstSrc) {
+			if (melted_unit_move(unit, firstSrc, firstDest) != mvcp_ok)
+				return RESPONSE_BAD_FILE;
+		} else {
+			if (melted_unit_move(unit, firstSrc + i, firstDest + i) != mvcp_ok)
+				return RESPONSE_BAD_FILE;
+		}
 	}
 
 	return RESPONSE_SUCCESS;
