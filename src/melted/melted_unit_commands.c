@@ -258,24 +258,19 @@ int melted_move( command_argument cmd_arg )
 {
 	melted_unit unit = melted_get_unit(cmd_arg->unit);
 	
-	if ( unit != NULL )
-	{
-		if ( mvcp_tokeniser_count( cmd_arg->tokeniser ) > 2 )
-		{
-			int src = parse_clip( cmd_arg, 2 );
-			int dest = parse_clip( cmd_arg, 3 );
-			
-			if ( melted_unit_move( unit, src, dest ) != mvcp_ok )
-				return RESPONSE_BAD_FILE;
-		}
-		else
-		{
-			return RESPONSE_MISSING_ARG;
-		}
-	}
-	else
-	{
+	if (unit == NULL)
 		return RESPONSE_INVALID_UNIT;
+
+	int move_count = (mvcp_tokeniser_count(cmd_arg->tokeniser) - 2)/2;
+	move_count = move_count ? move_count : 1;
+
+	for (int i = 0; i < move_count; ++i) {
+		int base_index = 2 + i*2;
+		int src = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, base_index));
+		int dest = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, base_index + 1));
+
+		if (melted_unit_move(unit, src, dest) != mvcp_ok)
+			return RESPONSE_BAD_FILE;
 	}
 
 	return RESPONSE_SUCCESS;
