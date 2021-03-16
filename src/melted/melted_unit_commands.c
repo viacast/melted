@@ -267,6 +267,10 @@ int melted_move( command_argument cmd_arg )
 		move_count = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, 4));
 	}
 
+	if (mvcp_tokeniser_count(cmd_arg->tokeniser) < 4) {
+		return RESPONSE_MISSING_ARG;
+	}
+
 	int firstSrc = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, 2));
 	int firstDest = atoi(mvcp_tokeniser_get_string(cmd_arg->tokeniser, 3));
 
