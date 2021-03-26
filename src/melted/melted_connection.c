@@ -205,7 +205,7 @@ void *parser_thread( void *arg )
 	connection_t *connection = arg;
 	mlt_properties owner = connection->owner;
 	char address[ 512 ];
-	char command[ 1024 ];
+	char command[ 10240 ];
 	int fd = connection->fd;
 	mvcp_parser parser = connection->parser;
 	mvcp_response response = NULL;
@@ -224,7 +224,7 @@ void *parser_thread( void *arg )
 	{
 		int error = 0;
 
-		while( !error && connection_read( fd, command, 1024 ) )
+		while( !error && connection_read( fd, command, 10240 ) )
 		{
 			response = NULL;
 

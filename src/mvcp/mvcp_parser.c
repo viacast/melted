@@ -88,9 +88,9 @@ mvcp_response mvcp_parser_run_file( mvcp_parser parser, FILE *file )
 	mvcp_response response = mvcp_response_init( );
 	if ( response != NULL )
 	{
-		char command[ 1024 ];
+		char command[ 10240 ];
 		mvcp_response_set_error( response, 201, "OK" );
-		while ( mvcp_response_get_error_code( response ) == 201 && fgets( command, 1024, file ) )
+		while ( mvcp_response_get_error_code( response ) == 201 && fgets( command, 10240, file ) )
 		{
 			mvcp_util_trim( mvcp_util_chomp( command ) );
 			if ( strcmp( command, "" ) && command[ 0 ] != '#' )

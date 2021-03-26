@@ -58,7 +58,7 @@ int main( int argc, char **argv  )
 {
 	mvcp_parser parser = NULL;
 	mvcp_response response = NULL;
-	char temp[ 1024 ];
+	char temp[ 10240 ];
 	int index = 1;
 
 	atexit( cleanup );
@@ -86,7 +86,7 @@ int main( int argc, char **argv  )
 			report( response );
 		}
 	
-		while ( response != NULL && prompt( temp, 1024 ) )
+		while ( response != NULL && prompt( temp, 10240 ) )
 		{
 			mvcp_util_trim( mvcp_util_chomp( temp ) );
 			if ( !strcasecmp( temp, "BYE" ) )

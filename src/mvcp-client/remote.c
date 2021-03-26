@@ -119,12 +119,12 @@ static int parse_command_line( mvcp_parser parser, int argc, char **argv )
 			else if ( !strcmp( argv[i], "-push" ) && ( i + 1 ) < argc )
 			{
 				char command[10];
-				char line[1024];
+				char line[10240];
 				char *buffer = NULL;
 				size_t size = 0;
 
 				sprintf( command, "PUSH U%s", argv[++i] );
-				while ( fgets( line, 1024, stdin ) )
+				while ( fgets( line, 10240, stdin ) )
 				{
 					if ( !strcmp( line, "" ) )
 						break;
