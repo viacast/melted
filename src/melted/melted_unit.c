@@ -397,7 +397,12 @@ mvcp_error_code melted_unit_move( melted_unit unit, int src, int dest )
 
 mvcp_error_code melted_unit_check_clip(melted_unit unit, char *clip)
 {
-	return locate_producer(unit, clip) ? mvcp_ok : mvcp_invalid_file;
+	mlt_producer instance = locate_producer( unit, clip );
+	mvcp_error_code r = instance ? mvcp_ok : mvcp_invalid_file;
+	if (instance) {
+		mlt_producer_close(instance);
+	}
+	return r;
 }
 
 /** Add a clip to the unit play list.
