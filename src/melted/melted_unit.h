@@ -39,6 +39,7 @@ melted_unit_t, *melted_unit;
 
 extern melted_unit         melted_unit_init( int index, char *arg );
 extern void 				melted_unit_report_list( melted_unit unit, mvcp_response response );
+extern int                 melted_unit_count( melted_unit unit );
 extern void                 melted_unit_allow_stdin( melted_unit unit, int flag );
 extern mvcp_error_code   melted_unit_load( melted_unit unit, char *clip, int32_t in, int32_t out, int flush );
 extern mvcp_error_code 	melted_unit_insert( melted_unit unit, char *clip, int index, int32_t in, int32_t out );

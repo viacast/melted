@@ -288,6 +288,13 @@ void melted_unit_report_list( melted_unit unit, mvcp_response response )
 	mvcp_response_printf( response, 1024, "\n" );
 }
 
+int melted_unit_count( melted_unit unit )
+{
+	mlt_properties properties = unit->properties;
+	mlt_playlist playlist = mlt_properties_get_data( properties, "playlist", NULL );
+	return mlt_playlist_count(playlist);
+}
+
 /** Load a clip into the unit clearing existing play list.
 
     \todo error handling

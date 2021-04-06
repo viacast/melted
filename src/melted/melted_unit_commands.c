@@ -174,11 +174,16 @@ int melted_insert( command_argument cmd_arg )
 		clips[i].out = out;
 	}
 
-	qsort(clips, clip_count, sizeof(Clip), cmpinsert);
+	int prev_count = melted_unit_count(unit);
 
+	qsort(clips, clip_count, sizeof(Clip), cmpinsert);
 	for (int i = 0; i < clip_count; ++i) {
 		if (melted_unit_insert(unit, clips[i].name, clips[i].target_index, clips[i].in, clips[i].out) != mvcp_ok)
 			return RESPONSE_BAD_FILE;
+	}
+
+	if (!prev_count) {
+		melted_unit_change_position(unit, 0, 0);
 	}
 
 	return RESPONSE_SUCCESS;
