@@ -272,7 +272,8 @@ void melted_unit_report_list( melted_unit unit, mvcp_response response )
 	{
 		mlt_playlist_clip_info info;
 		char *title;
-		mlt_playlist_get_clip_info( playlist , &info, i );
+		int error = mlt_playlist_get_clip_info( playlist , &info, i );
+		if (error) continue;
 		title = mlt_properties_get( MLT_PRODUCER_PROPERTIES( info.producer ), "title" );
 		if ( title == NULL )
 			title = strip_root( unit, info.resource );

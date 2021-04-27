@@ -187,6 +187,59 @@ response_codes melted_list_clips( command_argument cmd_arg )
 	return error;
 }
 
+/** List clips in a directory.
+*/
+response_codes melted_list_dir( command_argument cmd_arg )
+{
+	response_codes error = RESPONSE_BAD_FILE;
+	const char *dir_name = (const char*) cmd_arg->argument;
+	DIR *dir;
+	char fullname[1024];
+	struct dirent **de = NULL;
+	int i, n;
+	snprintf( fullname, 1023, "%s", cmd_arg->root_dir );
+	if (strlen(dir_name)) {
+		if (dir_name[0] == '/') {
+			snprintf( fullname, 1023, "%s", dir_name );
+		} else {
+			strncat(fullname, dir_name, 1023);
+		}
+	}
+	int len = strlen(fullname);
+	if ( len && fullname[ len - 1 ] != '/')
+	{
+		fullname[ len ] = '/';
+		fullname[ len + 1 ] = '\0';
+	}
+	dir = opendir( fullname );
+	if (dir != NULL)
+	{
+		char path[1024];
+		struct stat info;
+		error = RESPONSE_SUCCESS_N;
+		n = scandir( fullname, &de, filter_files, alphasort );
+		for (i = 0; i < n; i++ )
+		{
+			snprintf( path, 1023, "%s%s", fullname, de[i]->d_name );
+			if ( stat( path, &info ) == 0 && S_ISDIR( info.st_mode ) )
+				mvcp_response_printf( cmd_arg->response, 1024, "\"%s\"\n", path );
+		}
+		for (i = 0; i < n; i++ )
+		{
+			snprintf( path, 1023, "%s%s", fullname, de[i]->d_name );
+			if ( lstat( path, &info ) == 0 &&
+				 ( S_ISREG( info.st_mode ) || S_ISLNK( info.st_mode ) || ( strstr( path, ".clip" ) && info.st_mode | S_IXUSR ) ) )
+				mvcp_response_printf( cmd_arg->response, 1024, "\"%s\" %llu\n", path, (unsigned long long) info.st_size );
+			free( de[ i ] );
+		}
+		free( de );
+		closedir( dir );
+		mvcp_response_write( cmd_arg->response, "\n", 1 );
+	}
+
+	return error;
+}
+
 /** Set a server configuration property.
 */
 

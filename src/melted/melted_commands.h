@@ -41,6 +41,7 @@ extern response_codes melted_add_unit( command_argument );
 extern response_codes melted_list_nodes( command_argument );
 extern response_codes melted_list_units( command_argument );
 extern response_codes melted_list_clips( command_argument );
+extern response_codes melted_list_dir( command_argument );
 extern response_codes melted_set_global_property( command_argument );
 extern response_codes melted_get_global_property( command_argument );
 

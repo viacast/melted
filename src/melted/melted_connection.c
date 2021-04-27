@@ -33,6 +33,10 @@
 #include <netdb.h>
 #include <sys/socket.h> 
 #include <arpa/inet.h>
+#include <sys/inotify.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #include <mvcp/mvcp_socket.h>
 
@@ -41,6 +45,13 @@
 #include "melted_connection.h"
 #include "melted_server.h"
 #include "melted_log.h"
+
+
+#define FS_MAX_EVENTS 1024
+#define FS_NAME_LENGTH 1024
+#define FS_EVENT_SIZE (sizeof(struct inotify_event))
+#define FS_BUFFER_LENGTH FS_MAX_EVENTS*(FS_EVENT_SIZE+FS_NAME_LENGTH)
+
 
 /** This is a generic replacement for fgets which operates on a file
    descriptor. Unlike fgets, we can also specify a line terminator. Maximum
@@ -194,6 +205,73 @@ int connection_status( int fd, mvcp_notifier notifier )
 	return error;
 }
 
+int add_watch(int ifd, char *path) {
+
+}
+
+int connection_fs(int fd, mvcp_notifier notifier, char *path) {
+	int error = 0;
+	int index = 0;
+	mvcp_status_t status;
+	char text[ 10240 ];
+	mvcp_socket socket = mvcp_socket_init_fd( fd );
+
+	fd_set ifd_set;
+	int ifd, iwd;
+
+	ifd = inotify_init();
+	error = fcntl(ifd, F_SETFL, O_NONBLOCK);
+	if (error < 0) {
+		snprintf(text, 10239, "FCNTL CHECK FAILED. CODE=%d\n", error);
+		mvcp_socket_write_data( socket, text, strlen(text) ) != strlen(text);
+	} else {
+		error = 0;
+	}
+	
+	iwd = inotify_add_watch(ifd, path, IN_MOVE | IN_CREATE | IN_DELETE);
+	if (iwd == -1){
+		snprintf(text, 10239, "FAILED TO WATCH '%s'. CODE=%d\n", path, errno);
+		mvcp_socket_write_data(socket, text, strlen(text)) != strlen(text);
+		error = 1;
+	}
+
+	FD_ZERO( &ifd_set );
+	FD_SET( ifd, &ifd_set );
+
+	while (!error) {
+		int i, length;
+		char buffer[FS_BUFFER_LENGTH];
+		select(ifd + 1, &ifd_set, NULL, NULL, NULL);
+		length = read(ifd, buffer, FS_BUFFER_LENGTH);
+		struct inotify_event *event;
+		for (i = 0; !error && i < length; i += FS_EVENT_SIZE + event->len) {
+			event = (struct inotify_event *) &buffer[i];
+			int watched = 0;
+			char file_type[] = event->mask & IN_ISDIR ? "DIR" : "FILE";
+			char event_type[16];
+			if (event->mask & IN_CREATE) {
+				snprintf(event_type, 16, "CREATE");
+			} 
+			if (event->mask & IN_DELETE) {
+				snprintf(event_type, 16, "DELETE");
+			}
+			if (event->mask & IN_MOVE) {
+				snprintf(event_type, 16, "MOVE");
+			}
+			if (strlen(event_type)) {
+				snprintf(text, 16, "%s %s %s\n", event_type, file_type, event->name);
+				error = mvcp_socket_write_data(socket, text, strlen(text)) != strlen(text);
+			}
+		}
+	}
+	if (ifd) {
+		inotify_rm_watch(ifd, iwd);
+		close(ifd);
+	}
+	mvcp_socket_close(socket);
+	return error;
+}
+
 static void connection_close( int fd )
 {
 	close( fd );
@@ -285,6 +363,11 @@ void *parser_thread( void *arg )
 				mvcp_response_close( response );
 				mlt_service_close( service );
 				free( buffer );
+			}
+			else if (!strncmp(command, "WATCHFS", 7)) {
+				char path[1024];
+				connection_read(fd, path, 1024);
+				error = connection_fs(fd, mvcp_parser_get_notifier(parser), path);
 			}
 			else if ( strncmp( command, "STATUS", 6 ) )
 			{

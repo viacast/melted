@@ -174,6 +174,7 @@ static command_t vocabulary[] =
 	{"UADD", melted_add_unit, 0, ATYPE_STRING, "Create a new playout unit (virtual VTR) to transmit to receiver specified in GUID argument."},
 	{"ULS", melted_list_units, 0, ATYPE_NONE, "Lists the units that have already been added to the server."},
 	{"CLS", melted_list_clips, 0, ATYPE_STRING, "Lists the clips at directory name argument."},
+	{"LS", melted_list_dir, 0, ATYPE_STRING, "Lists the folders and files in the directory."},
 	{"SET", melted_set_global_property, 0, ATYPE_PAIR, "Set a server configuration property."},
 	{"GET", melted_get_global_property, 0, ATYPE_STRING, "Get a server configuration property."},
 	{"RUN", melted_run, 0, ATYPE_STRING, "Run a batch file." },
@@ -483,8 +484,14 @@ static mvcp_response melted_local_execute( melted_local local, char *command )
 			if ( melted_command_get_error( &cmd ) == RESPONSE_SUCCESS )
 			{
 				cmd.argument = melted_command_parse_argument( &cmd, position, vocabulary[ index ].type, command );
-				if ( cmd.argument == NULL && vocabulary[ index ].type != ATYPE_NONE )
+				if ( cmd.argument == NULL && vocabulary[ index ].type == ATYPE_STRING ) {
+					char *arg = (char *)malloc(1);
+					arg[0] = '\0';
+					cmd.argument = arg;
+				}
+				if ( cmd.argument == NULL && vocabulary[ index ].type != ATYPE_NONE ) {
 					melted_command_set_error( &cmd, RESPONSE_MISSING_ARG );
+				}
 				position ++;
 			}
 
