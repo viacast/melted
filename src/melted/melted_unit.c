@@ -776,27 +776,17 @@ void melted_unit_step( melted_unit unit, int32_t offset )
 int melted_unit_set( melted_unit unit, char *name_value )
 {
 	mlt_properties properties = NULL;
-
-	if ( strncmp( name_value, "consumer.", 9 ) )
-	{
-		if ( strncmp( name_value, "producer.", 9 ) )
-		{
-			mlt_playlist playlist = mlt_properties_get_data( unit->properties, "playlist", NULL );
-			properties = MLT_PLAYLIST_PROPERTIES( playlist );
-		}
-		else
-		{
-			properties = mlt_properties_get_data( unit->properties, "producer", NULL );
-			name_value += 9;
-		}
-	}
-	else
-	{
+	if ( !strncmp( name_value, "consumer.", 9 ) ) {
 		mlt_consumer consumer = mlt_properties_get_data( unit->properties, "consumer", NULL );
 		properties = MLT_CONSUMER_PROPERTIES( consumer );
 		name_value += 9;
+	} else if ( !strncmp( name_value, "producer.", 9 ) ) {
+		properties = mlt_properties_get_data( unit->properties, "producer", NULL );
+		name_value += 9;
+	} else {
+		mlt_playlist playlist = mlt_properties_get_data( unit->properties, "playlist", NULL );
+		properties = MLT_PLAYLIST_PROPERTIES( playlist );
 	}
-
 	return mlt_properties_parse( properties, name_value );
 }
 

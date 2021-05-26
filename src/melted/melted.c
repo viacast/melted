@@ -181,6 +181,18 @@ int main( int argc, char **argv )
 					melted_log( LOG_NOTICE, "AS-RUN U%d \"%s\" len %d pos %d", index, status.clip, status.length, status.position );
 					asrun[ index ].is_logged = 1;
 				}
+				
+				mlt_properties properties = unit->properties;
+				mlt_playlist playlist = mlt_properties_get_data( properties, "playlist", NULL );
+				mlt_producer producer = MLT_PLAYLIST_PRODUCER( playlist );				
+				if (status.status == unit_stopped) {
+					void ( *notifier )( void * ) = mlt_properties_get_data( MLT_PRODUCER_PROPERTIES(producer), "notifier", NULL );
+					if ( notifier != NULL )
+					{
+						void *argument = mlt_properties_get_data( MLT_PRODUCER_PROPERTIES(producer), "notifier_arg", NULL );
+						if (argument != NULL) notifier( argument );
+					}
+				}
 			}
 		}
 	}
