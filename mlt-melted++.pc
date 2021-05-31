@@ -1,0 +1,14 @@
+prefix=/root/melted/20210531
+exec_prefix=/root/melted/20210531
+libdir=/root/melted/20210531/lib
+includedir=/root/melted/20210531/include
+version=0.3.11
+cflags=-I/root/melted/20210531/include -I/root/melted/20210531/include/mlt/melted++ -D_REENTRANT
+libs=-L/root/melted/20210531/lib -lmelted++
+
+Name: mlt-melted++
+Description: C++ API for MLT Miracle
+Version: ${version}
+Requires: mlt-melted
+Libs: -L${libdir} ${libs}
+Cflags: ${cflags}

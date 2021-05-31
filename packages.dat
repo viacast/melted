@@ -1,0 +1,3 @@
+mvcp	-I/root/melted/20210531/include/mlt -D_REENTRANT	-L/root/melted/20210531/lib -lmvcp
+melted	-I/root/melted/20210531/include/mlt -D_REENTRANT	-L/root/melted/20210531/lib -lmelted
+melted++	-I/root/melted/20210531/include -I/root/melted/20210531/include/mlt/melted++ -D_REENTRANT	-L/root/melted/20210531/lib -lmelted++
