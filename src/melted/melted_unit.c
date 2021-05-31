@@ -685,12 +685,12 @@ int melted_unit_set_clip_in( melted_unit unit, int index, int32_t position )
 
 	if ( error == 0 )
 	{
-		// melted_unit_play( unit, 0 );
+		melted_unit_play( unit, 0 );
 		mlt_service_lock( MLT_PLAYLIST_SERVICE( playlist ) );
 		error = mlt_playlist_resize_clip( playlist, index, position, info.frame_out );
 		mlt_service_unlock( MLT_PLAYLIST_SERVICE( playlist ) );
 		update_generation( unit );
-		// melted_unit_change_position( unit, index, 0 );
+		melted_unit_change_position( unit, index, 0 );
 	}
 
 	return error;
@@ -708,13 +708,13 @@ int melted_unit_set_clip_out( melted_unit unit, int index, int32_t position )
 
 	if ( error == 0 )
 	{
-		// melted_unit_play( unit, 0 );
+		melted_unit_play( unit, 0 );
 		mlt_service_lock( MLT_PLAYLIST_SERVICE( playlist ) );
 		error = mlt_playlist_resize_clip( playlist, index, info.frame_in, position );
 		mlt_service_unlock( MLT_PLAYLIST_SERVICE( playlist ) );
 		update_generation( unit );
 		melted_unit_status_communicate( unit );
-		// melted_unit_change_position( unit, index, -1 );
+		melted_unit_change_position( unit, index, -1 );
 	}
 
 	return error;
