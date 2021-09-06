@@ -45,6 +45,8 @@
 #include "melted_unit_commands.h"
 #include "melted_log.h"
 
+#include "ndi/Processing.NDI.Lib.h"
+
 /** Private melted_local structure.
 */
 
@@ -65,6 +67,7 @@ static mvcp_response melted_local_receive( melted_local, char *, char * );
 static void melted_local_close( melted_local );
 response_codes melted_help( command_argument arg );
 response_codes melted_run( command_argument arg );
+response_codes melted_list_ndi( command_argument arg );
 response_codes melted_shutdown( command_argument arg );
 
 /** MVCP Parser constructor.
@@ -177,6 +180,7 @@ static command_t vocabulary[] =
 	{"SET", melted_set_global_property, 0, ATYPE_PAIR, "Set a server configuration property."},
 	{"GET", melted_get_global_property, 0, ATYPE_STRING, "Get a server configuration property."},
 	{"RUN", melted_run, 0, ATYPE_STRING, "Run a batch file." },
+	{"NDI", melted_list_ndi, 0, ATYPE_NONE, "List available NDI sources."},
 	{"LIST", melted_list, 1, ATYPE_NONE, "List the playlist associated to a unit."},
 	{"LOAD", melted_load, 1, ATYPE_STRING, "Load clip specified in absolute filename argument."},
 	{"INSERT", melted_insert, 1, ATYPE_STRING, "Insert a clip at the given clip index."},
@@ -266,6 +270,37 @@ response_codes melted_run( command_argument cmd_arg )
 	}
 
 	return mvcp_response_get_error_code( cmd_arg->response );
+}
+
+response_codes melted_list_ndi( command_argument cmd_arg )
+{
+	const NDIlib_find_create_t find_create_desc = { 
+		.show_local_sources = true,
+		.p_groups = NULL,
+		.p_extra_ips = NULL 
+	};
+	NDIlib_find_instance_t ndi_find = NDIlib_find_create2( &find_create_desc );
+	if ( !ndi_find ) {
+		mlt_log_error( NULL, "%s: NDIlib_find_create failed\n", __FUNCTION__ );
+		return RESPONSE_ERROR;
+	}
+
+	int wait = NDIlib_find_wait_for_sources( ndi_find, 2000 );
+	if (!wait) {
+		NDIlib_find_destroy( ndi_find );
+		return RESPONSE_SUCCESS;
+	}
+
+	int source_count;
+	const NDIlib_source_t* ndi_srcs = NDIlib_find_get_current_sources(ndi_find, &source_count);
+
+	fprintf(stderr, "source_count=%d\n", source_count);
+	for (int i = 0; i < source_count; ++i) {
+		mvcp_response_printf(cmd_arg->response, 10240, "%s\n", ndi_srcs[i].p_ndi_name);
+	}
+
+	NDIlib_find_destroy( ndi_find );
+	return RESPONSE_SUCCESS;
 }
 
 response_codes melted_shutdown( command_argument cmd_arg )
