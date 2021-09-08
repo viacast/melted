@@ -285,7 +285,7 @@ response_codes melted_list_ndi( command_argument cmd_arg )
 		return RESPONSE_ERROR;
 	}
 
-	int wait = NDIlib_find_wait_for_sources( ndi_find, 2000 );
+	int wait = NDIlib_find_wait_for_sources( ndi_find, 500 );
 	if (!wait) {
 		NDIlib_find_destroy( ndi_find );
 		return RESPONSE_SUCCESS;
@@ -293,7 +293,17 @@ response_codes melted_list_ndi( command_argument cmd_arg )
 
 	int source_count;
 	const NDIlib_source_t* ndi_srcs = NDIlib_find_get_current_sources(ndi_find, &source_count);
+	for (int i = 0; i < source_count; ++i) {
+		mvcp_response_printf(cmd_arg->response, 10240, "%s\n", ndi_srcs[i].p_ndi_name);
+	}
 
+	wait = NDIlib_find_wait_for_sources( ndi_find, 500 );
+	if (!wait) {
+		NDIlib_find_destroy( ndi_find );
+		return RESPONSE_SUCCESS;
+	}
+
+	ndi_srcs = NDIlib_find_get_current_sources(ndi_find, &source_count);
 	for (int i = 0; i < source_count; ++i) {
 		mvcp_response_printf(cmd_arg->response, 10240, "%s\n", ndi_srcs[i].p_ndi_name);
 	}
