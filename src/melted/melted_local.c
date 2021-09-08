@@ -294,7 +294,6 @@ response_codes melted_list_ndi( command_argument cmd_arg )
 	int source_count;
 	const NDIlib_source_t* ndi_srcs = NDIlib_find_get_current_sources(ndi_find, &source_count);
 
-	fprintf(stderr, "source_count=%d\n", source_count);
 	for (int i = 0; i < source_count; ++i) {
 		mvcp_response_printf(cmd_arg->response, 10240, "%s\n", ndi_srcs[i].p_ndi_name);
 	}
