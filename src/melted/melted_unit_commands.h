@@ -50,6 +50,7 @@ extern response_codes melted_set_out_point( command_argument );
 extern response_codes melted_get_unit_status( command_argument );
 extern response_codes melted_set_unit_property( command_argument );
 extern response_codes melted_get_unit_property( command_argument );
+extern response_codes melted_delete_unit_property( command_argument );
 extern response_codes melted_transfer( command_argument );
 extern response_codes melted_push( command_argument, mlt_service );
 extern response_codes melted_receive( command_argument, char * );

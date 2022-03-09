@@ -70,6 +70,7 @@ extern void                 melted_unit_suspend( melted_unit );
 extern void                 melted_unit_restore( melted_unit );
 extern int					melted_unit_set( melted_unit, char *name_value );
 extern char *				melted_unit_get( melted_unit, char *name );
+extern int  				melted_unit_delete( melted_unit, char *name );
 extern int					melted_unit_get_current_clip( melted_unit );
 
 

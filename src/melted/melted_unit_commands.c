@@ -570,6 +570,21 @@ int melted_get_unit_property( command_argument cmd_arg )
 	return RESPONSE_SUCCESS;
 }
 
+int melted_delete_unit_property( command_argument cmd_arg )
+{
+	melted_unit unit = melted_get_unit(cmd_arg->unit);
+	char *name = (char*) cmd_arg->argument;
+	if (unit == NULL)
+	{
+		return RESPONSE_INVALID_UNIT;
+	}
+	else
+	{
+		melted_unit_delete( unit, name );
+	}
+	return RESPONSE_SUCCESS;
+}
+
 
 int melted_transfer( command_argument cmd_arg )
 {

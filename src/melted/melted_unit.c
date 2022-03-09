@@ -797,6 +797,13 @@ char *melted_unit_get( melted_unit unit, char *name )
 	return mlt_properties_get( properties, name );
 }
 
+int melted_unit_delete( melted_unit unit, char *name )
+{
+	mlt_playlist playlist = mlt_properties_get_data( unit->properties, "playlist", NULL );
+	mlt_properties properties = MLT_PLAYLIST_PROPERTIES( playlist );
+	return mlt_properties_delete( properties, name );
+}
+
 /** Release the unit
 
     \todo error handling

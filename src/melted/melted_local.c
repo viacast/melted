@@ -202,6 +202,7 @@ static command_t vocabulary[] =
 	{"USTA", melted_get_unit_status, 1, ATYPE_NONE, "Report information about the unit."},
 	{"USET", melted_set_unit_property, 1, ATYPE_PAIR, "Set a unit configuration property."},
 	{"UGET", melted_get_unit_property, 1, ATYPE_STRING, "Get a unit configuration property."},
+	{"UDEL", melted_delete_unit_property, 1, ATYPE_STRING, "Deletes a unit configuration property."},
 	{"XFER", melted_transfer, 1, ATYPE_STRING, "Transfer the unit's clip to another unit specified as argument."},
 	{"SHUTDOWN", melted_shutdown, 0, ATYPE_NONE, "Shutdown the server."},
 	{NULL, NULL, 0, ATYPE_NONE, NULL}
