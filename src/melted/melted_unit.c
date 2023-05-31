@@ -662,6 +662,35 @@ void melted_unit_change_position( melted_unit unit, int clip, int32_t position )
 	melted_unit_status_communicate( unit );
 }
 
+/** Change position in the playlist.
+*/
+
+void melted_unit_change_position_initial( melted_unit unit, int clip )
+{
+	mlt_properties properties = unit->properties;
+	mlt_playlist playlist = mlt_properties_get_data( properties, "playlist", NULL );
+	mlt_producer producer = MLT_PLAYLIST_PRODUCER( playlist );
+	mlt_playlist_clip_info info;
+
+	if ( clip < 0 )
+	{
+		clip = 0;
+	}
+	else if ( clip >= mlt_playlist_count( playlist ) )
+	{
+		clip = mlt_playlist_count( playlist ) - 1;
+	}
+
+	if ( mlt_playlist_get_clip_info( playlist, &info, clip ) == 0 )
+	{
+		mlt_consumer consumer = mlt_properties_get_data( unit->properties, "consumer", NULL );
+		mlt_producer_seek( producer, info.start );
+		mlt_properties_set_int( MLT_CONSUMER_PROPERTIES(consumer), "refresh", 1 );
+	}
+
+	melted_unit_status_communicate( unit );
+}
+
 /** Get the index of the current clip.
 */
 
@@ -715,7 +744,29 @@ int melted_unit_set_clip_out( melted_unit unit, int index, int32_t position )
 		update_generation( unit );
 		melted_unit_status_communicate( unit );
 		melted_unit_change_position( unit, index, -1 );
-		melted_unit_play( unit, 1000 );
+	}
+
+	return error;
+}
+
+/** Set a clip's out point when livestream.
+*/
+
+int melted_unit_set_clip_out_live( melted_unit unit, int index, int32_t position )
+{
+	mlt_properties properties = unit->properties;
+	mlt_playlist playlist = mlt_properties_get_data( properties, "playlist", NULL );
+	mlt_playlist_clip_info info;
+	int error = mlt_playlist_get_clip_info( playlist, &info, index );
+
+	if ( error == 0 )
+	{
+		mlt_service_lock( MLT_PLAYLIST_SERVICE( playlist ) );
+		error = mlt_playlist_resize_clip( playlist, index, info.frame_in, position );
+		mlt_service_unlock( MLT_PLAYLIST_SERVICE( playlist ) );
+		update_generation( unit );
+		melted_unit_status_communicate( unit );
+		melted_unit_change_position_initial( unit, index );
 	}
 
 	return error;

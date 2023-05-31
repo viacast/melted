@@ -64,6 +64,7 @@ extern void                 melted_unit_change_position( melted_unit, int, int32
 extern void                 melted_unit_change_speed( melted_unit unit, int speed );
 extern int                  melted_unit_set_clip_in( melted_unit unit, int index, int32_t position );
 extern int                  melted_unit_set_clip_out( melted_unit unit, int index, int32_t position );
+extern int                  melted_unit_set_clip_out_live( melted_unit unit, int index, int32_t position );
 extern void                 melted_unit_step( melted_unit unit, int32_t offset );
 extern void                 melted_unit_close( melted_unit unit );
 extern void                 melted_unit_suspend( melted_unit );
