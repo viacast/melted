@@ -47,6 +47,7 @@ extern response_codes melted_goto( command_argument );
 extern response_codes melted_ff( command_argument );
 extern response_codes melted_set_in_point( command_argument );
 extern response_codes melted_set_out_point( command_argument );
+extern response_codes melted_set_out_point_live( command_argument );
 extern response_codes melted_get_unit_status( command_argument );
 extern response_codes melted_set_unit_property( command_argument );
 extern response_codes melted_get_unit_property( command_argument );

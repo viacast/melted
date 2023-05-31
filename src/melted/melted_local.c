@@ -199,6 +199,7 @@ static command_t vocabulary[] =
 	{"GOTO", melted_goto, 1, ATYPE_INT, "Jump to frame number supplied as argument."},
 	{"SIN", melted_set_in_point, 1, ATYPE_INT, "Set the IN point of the loaded clip to frame number argument. -1 = reset in point to 0"},
 	{"SOUT", melted_set_out_point, 1, ATYPE_INT, "Set the OUT point of the loaded clip to frame number argument. -1 = reset out point to maximum."},
+	{"SOUTL", melted_set_out_point_live, 1, ATYPE_INT, "Set the OUT point of the loaded clip to frame number argument. -1 = reset out point to maximum."},
 	{"USTA", melted_get_unit_status, 1, ATYPE_NONE, "Report information about the unit."},
 	{"USET", melted_set_unit_property, 1, ATYPE_PAIR, "Set a unit configuration property."},
 	{"UGET", melted_get_unit_property, 1, ATYPE_STRING, "Get a unit configuration property."},

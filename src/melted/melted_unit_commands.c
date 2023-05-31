@@ -525,6 +525,29 @@ int melted_set_out_point( command_argument cmd_arg )
 	return RESPONSE_SUCCESS;
 }
 
+int melted_set_out_point_live( command_argument cmd_arg )
+{
+	melted_unit unit = melted_get_unit(cmd_arg->unit);
+	int clip = parse_clip( cmd_arg, 3 );
+	
+	if ( unit == NULL )
+		return RESPONSE_INVALID_UNIT;
+	else
+	{
+		int position = *(int *) cmd_arg->argument;
+
+		switch( melted_unit_set_clip_out_live( unit, clip, position ) )
+		{
+			case -1:
+				return RESPONSE_BAD_FILE;
+			case -2:
+				return RESPONSE_OUT_OF_RANGE;
+		}
+	}
+
+	return RESPONSE_SUCCESS;
+}
+
 int melted_get_unit_status( command_argument cmd_arg )
 {
 	mvcp_status_t status;
