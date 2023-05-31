@@ -715,6 +715,7 @@ int melted_unit_set_clip_out( melted_unit unit, int index, int32_t position )
 		update_generation( unit );
 		melted_unit_status_communicate( unit );
 		melted_unit_change_position( unit, index, -1 );
+		melted_unit_play( unit, 1000 );
 	}
 
 	return error;
